@@ -1,5 +1,6 @@
 package com.garbagemule.MobArena.util;
 
+import com.elmakers.mine.bukkit.magic.MagicPlugin;
 import com.garbagemule.MobArena.MobArena;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -145,6 +146,11 @@ public class ItemParser
     public static ItemStack parseItem(String item) {
         if (item == null || item.equals(""))
             return null;
+
+        if (item.startsWith("magic:")) {
+            item = item.substring(6);
+            return MagicPlugin.getAPI().getController().createItem(item);
+        }
         
         // Check if the item has enchantments.
         String[] space = item.split(" ");

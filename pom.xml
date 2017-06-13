@@ -71,6 +71,13 @@
       <version>1.5</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.elmakers.mine.bukkit.plugins</groupId>
+      <artifactId>Magic</artifactId>
+      <version>6.9</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
