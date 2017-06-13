@@ -350,7 +350,7 @@ public class MASpawnThread implements Runnable
                 if (meta != null && meta.hasDisplayName()) {
                     itemName = meta.getDisplayName();
                 } else {
-                    MAUtils.toCamelCase(reward.getType().toString());
+                    itemName = MAUtils.toCamelCase(reward.getType().toString());
                 }
                 if (reward.getAmount() > 1) {
                     itemName += ":" + reward.getAmount();
