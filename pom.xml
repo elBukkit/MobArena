@@ -71,15 +71,6 @@
       <version>1.5</version>
     </dependency>
 
-    <!-- Magic Spells (tentative) -->
-    <dependency>
-      <groupId>com.nisovin</groupId>
-      <artifactId>magicspells</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/MagicSpells.jar</systemPath>
-    </dependency>
-
     <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
