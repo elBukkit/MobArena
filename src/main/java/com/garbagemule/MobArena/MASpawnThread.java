@@ -4,6 +4,7 @@ import com.garbagemule.MobArena.events.ArenaCompleteEvent;
 import com.garbagemule.MobArena.events.NewWaveEvent;
 import com.garbagemule.MobArena.framework.Arena;
 import com.garbagemule.MobArena.region.ArenaRegion;
+import com.garbagemule.MobArena.things.Thing;
 import com.garbagemule.MobArena.waves.MABoss;
 import com.garbagemule.MobArena.waves.MACreature;
 import com.garbagemule.MobArena.waves.Wave;
@@ -17,8 +18,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,8 +98,8 @@ public class MASpawnThread implements Runnable
             return;
         }
 
-        // Grant rewards (if any) for the wave about to spawn
-        grantRewards(nextWave);
+        // Grant rewards (if any) for the wave that just ended
+        grantRewards(nextWave - 1);
 
         // Check if this is the final wave, in which case, end instead of spawn
         if (nextWave > 1 && (nextWave - 1) == waveManager.getFinalWave()) {
@@ -292,13 +291,13 @@ public class MASpawnThread implements Runnable
     }
 
     private void grantRewards(int wave) {
-        for (Map.Entry<Integer, List<ItemStack>> entry : arena.getEveryWaveEntrySet()) {
-            if (wave % entry.getKey() == 0) {
+        for (Map.Entry<Integer, List<Thing>> entry : arena.getEveryWaveEntrySet()) {
+            if (wave > 0 && wave % entry.getKey() == 0) {
                 addReward(entry.getValue());
             }
         }
 
-        List<ItemStack> after = arena.getAfterWaveReward(wave);
+        List<Thing> after = arena.getAfterWaveReward(wave);
         if (after != null) {
             addReward(after);
         }
@@ -327,35 +326,17 @@ public class MASpawnThread implements Runnable
     /**
      * Rewards all players with an item from the input String.
      */
-    private void addReward(List<ItemStack> rewards) {
+    private void addReward(List<Thing> rewards) {
         for (Player p : arena.getPlayersInArena()) {
-            ItemStack reward = MAUtils.getRandomReward(rewards);
+            Thing reward = rewards.get(MobArena.random.nextInt(rewards.size()));
             rewardManager.addReward(p, reward);
 
             if (reward == null) {
                 arena.getMessenger().tell(p, "ERROR! Problem with rewards. Notify server host!");
                 plugin.getLogger().warning("Could not add null reward. Please check the config-file!");
             }
-            else if (reward.getTypeId() == MobArena.ECONOMY_MONEY_ID) {
-                if (plugin.giveMoney(p, reward)) { // Money already awarded here, not needed at end of match as well
-                    arena.getMessenger().tell(p, Msg.WAVE_REWARD, plugin.economyFormat(reward));
-                }
-                else {
-                    plugin.getLogger().warning("Tried to add money, but no economy plugin detected!");
-                }
-            }
             else {
-                String itemName = "";
-                ItemMeta meta = reward.getItemMeta();
-                if (meta != null && meta.hasDisplayName()) {
-                    itemName = meta.getDisplayName();
-                } else {
-                    itemName = MAUtils.toCamelCase(reward.getType().toString());
-                }
-                if (reward.getAmount() > 1) {
-                    itemName += ":" + reward.getAmount();
-                }
-                arena.getMessenger().tell(p, Msg.WAVE_REWARD, itemName);
+                arena.getMessenger().tell(p, Msg.WAVE_REWARD, reward.toString());
             }
         }
     }
